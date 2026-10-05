@@ -1,35 +1,3120 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Melbourne Pedestrian Intelligence</title>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<style>
-:root{--bg:#f5f7f9;--card:#fff;--ink:#1f2937;--muted:#6b7280;--teal:#159a8c;--coral:#d46a5d;--gold:#d99a53;--line:#e5e7eb;--soft:#eef7f5}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1220px;margin:auto;padding:26px 20px 50px}header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}h1{font-size:clamp(30px,4vw,46px);margin:0 0 8px;letter-spacing:-.03em}.sub{color:var(--muted);line-height:1.5;max-width:800px}.badge{background:#e8f6f2;color:#0f766e;border:1px solid #cfe9e3;border-radius:999px;padding:8px 12px;font-size:12px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.tab.active{background:#173a4a;color:#fff}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 6px 22px rgba(15,23,42,.04)}.label{font-size:13px;color:var(--muted);margin-bottom:8px}.value{font-size:30px;font-weight:800}.mini{font-size:12px;color:var(--muted);margin-top:5px}.section{margin-top:16px}.title{font-size:21px;font-weight:800;margin:0 0 12px}.callout{background:var(--soft);border-left:5px solid var(--teal);padding:15px 18px;border-radius:10px;line-height:1.55;margin-top:14px}.chart{height:500px}.small{height:390px}.controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:14px}label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px}select{min-width:280px;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}.table{overflow:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid #edf0f2;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{background:#f8fafc;color:#475569}.loading,.error{padding:16px;border-radius:12px;margin-top:18px}.loading{background:#fff3cd;color:#7a5a00}.error{background:#fdecec;color:#9f2f2f}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:26px}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid{grid-template-columns:1fr}header{flex-direction:column}select{width:100%;min-width:0}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Melbourne Pedestrian Intelligence</title>
+
+  <meta
+    name="description"
+    content="Interactive Melbourne pedestrian analytics and TimesFM forecasting dashboard."
+  />
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- CSV Reader -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+
+    :root {
+      --bg: #f5f7f9;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+
+      --teal: #159a8c;
+      --teal2: #55b8aa;
+      --teal3: #78c9be;
+
+      --coral: #d46a5d;
+      --gold: #d99a53;
+      --blue: #485a82;
+
+      --soft: #eef7f5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+
+      background: var(--bg);
+      color: var(--ink);
+
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    .wrap {
+
+      max-width: 1240px;
+
+      margin: 0 auto;
+
+      padding:
+        28px
+        22px
+        50px;
+    }
+
+    header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      gap: 18px;
+
+      margin-bottom: 22px;
+    }
+
+    h1 {
+
+      margin:
+        0
+        0
+        8px;
+
+      font-size:
+        clamp(
+          30px,
+          4vw,
+          46px
+        );
+
+      line-height: 1.05;
+
+      font-weight: 800;
+
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+
+      color: var(--muted);
+
+      max-width: 820px;
+
+      line-height: 1.55;
+    }
+
+    .badge {
+
+      background: #e8f6f2;
+
+      color: #107466;
+
+      border:
+        1px solid
+        #cfe9e3;
+
+      border-radius: 999px;
+
+      padding:
+        8px
+        12px;
+
+      font-size: 13px;
+
+      white-space: nowrap;
+    }
+
+    .loading,
+    .error {
+
+      padding: 18px;
+
+      border-radius: 12px;
+
+      margin-top: 10px;
+    }
+
+    .loading {
+
+      background: #fff3cd;
+
+      color: #7a5a00;
+
+      border:
+        1px solid
+        #f2d58a;
+    }
+
+    .error {
+
+      background: #fdecec;
+
+      color: #9f2f2f;
+
+      border:
+        1px solid
+        #f4bcbc;
+    }
+
+    .tabs {
+
+      display: flex;
+
+      gap: 8px;
+
+      flex-wrap: wrap;
+
+      margin:
+        18px
+        0
+        22px;
+    }
+
+    .tab {
+
+      border:
+        1px solid
+        var(--line);
+
+      background: #ffffff;
+
+      color: #475569;
+
+      border-radius: 10px;
+
+      padding:
+        10px
+        14px;
+
+      font-weight: 650;
+
+      cursor: pointer;
+    }
+
+    .tab.active {
+
+      background: #173a4a;
+
+      color: white;
+
+      border-color: #173a4a;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          4,
+          1fr
+        );
+
+      gap: 14px;
+    }
+
+    .card {
+
+      background: var(--card);
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 16px;
+
+      padding: 18px;
+
+      box-shadow:
+        0
+        6px
+        22px
+        rgba(
+          15,
+          23,
+          42,
+          0.04
+        );
+    }
+
+    .metric-label {
+
+      font-size: 13px;
+
+      color: var(--muted);
+
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+
+      font-size: 30px;
+
+      font-weight: 800;
+
+      letter-spacing: -0.02em;
+    }
+
+    .metric-sub {
+
+      font-size: 12px;
+
+      color: var(--muted);
+
+      margin-top: 5px;
+    }
+
+    .section {
+
+      margin-top: 18px;
+    }
+
+    .section-title {
+
+      font-size: 21px;
+
+      font-weight: 780;
+
+      margin:
+        0
+        0
+        12px;
+    }
+
+    .callout {
+
+      background: var(--soft);
+
+      border-left:
+        5px solid
+        var(--teal);
+
+      padding:
+        15px
+        18px;
+
+      border-radius: 10px;
+
+      line-height: 1.55;
+
+      margin-top: 14px;
+    }
+
+    .controls {
+
+      display: flex;
+
+      gap: 12px;
+
+      flex-wrap: wrap;
+
+      align-items: end;
+
+      margin-bottom: 14px;
+    }
+
+    label {
+
+      display: block;
+
+      margin-bottom: 6px;
+
+      font-size: 13px;
+
+      color: var(--muted);
+
+      font-weight: 650;
+    }
+
+    select {
+
+      min-width: 300px;
+
+      padding:
+        11px
+        12px;
+
+      border:
+        1px solid
+        #cbd5e1;
+
+      border-radius: 10px;
+
+      background: white;
+
+      font-size: 14px;
+    }
+
+    .chart {
+      height: 500px;
+    }
+
+    .small-chart {
+      height: 390px;
+    }
+
+    .table-wrap {
+
+      overflow: auto;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 12px;
+
+      background: white;
+    }
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      font-size: 13px;
+    }
+
+    th,
+    td {
+
+      padding:
+        10px
+        12px;
+
+      border-bottom:
+        1px solid
+        #edf0f2;
+
+      text-align: right;
+
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+
+      text-align: left;
+    }
+
+    th {
+
+      background: #f8fafc;
+
+      color: #475569;
+
+      position: sticky;
+
+      top: 0;
+    }
+
+    footer {
+
+      margin-top: 28px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+
+      .grid {
+
+        grid-template-columns:
+          repeat(
+            2,
+            1fr
+          );
+      }
+
+      .chart {
+        height: 430px;
+      }
+    }
+
+    @media (max-width: 560px) {
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+      }
+
+      .badge {
+        white-space: normal;
+      }
+
+      select {
+
+        min-width: 100%;
+
+        width: 100%;
+      }
+    }
+
+  </style>
 </head>
-<body><div class="wrap">
-<header><div><h1>🚶 Melbourne Pedestrian Intelligence</h1><div class="sub">Interactive Melbourne pedestrian analytics and AI forecasting using precomputed TimesFM 3 forecasts.</div></div><div class="badge">GitHub Pages edition</div></header>
-<div id="status" class="loading">Loading dashboard data…</div>
-<div id="app" style="display:none">
-<div class="tabs"><button class="tab active" data-tab="overview">🏙️ Overview</button><button class="tab" data-tab="forecast">🔮 AI Forecast</button><button class="tab" data-tab="performance">🏆 Model Performance</button><button class="tab" data-tab="unusual">⚠️ Unusual Activity</button></div>
-<section id="overview" class="panel active"><div class="grid"><div class="card"><div class="label">Reliable sensors</div><div id="mSensors" class="value">—</div></div><div class="card"><div class="label">AI forecast locations</div><div id="mForecastSensors" class="value">—</div></div><div class="card"><div class="label">TimesFM test WAPE</div><div id="mWape" class="value">—</div></div><div class="card"><div class="label">WAPE error reduction</div><div id="mImprove" class="value">—</div></div></div><div class="section card"><h2 class="title">Project snapshot</h2><div>This dashboard combines pedestrian sensor analytics, multi-location 7-day forecasts, uncertainty intervals, model benchmarking and forecast-based unusual-activity screening.</div><div id="overviewCallout" class="callout"></div></div></section>
-<section id="forecast" class="panel"><div class="controls"><div><label for="sensorSelect">Pedestrian sensor</label><select id="sensorSelect"></select></div></div><div class="grid"><div class="card"><div class="label">Peak hour</div><div id="fPeak" class="value">—</div><div id="fPeakTime" class="mini">—</div></div><div class="card"><div class="label">168-hour total</div><div id="fTotal" class="value">—</div></div><div class="card"><div class="label">Hourly average</div><div id="fAvg" class="value">—</div></div><div class="card"><div class="label">Busiest complete day</div><div id="fBusyDay" class="value" style="font-size:20px">—</div><div id="fBusyTotal" class="mini">—</div></div></div><div class="section card"><h2 id="forecastTitle" class="title">7-day forecast</h2><div id="forecastChart" class="chart"></div></div><div class="section card"><h2 class="title">Predicted activity by day</h2><div id="dailyChart" class="small"></div></div></section>
-<section id="performance" class="panel"><div class="grid"><div class="card"><div class="label">WAPE reduction</div><div id="pWape" class="value">—</div></div><div class="card"><div class="label">MAE reduction</div><div id="pMae" class="value">—</div></div><div class="card"><div class="label">RMSE reduction</div><div id="pRmse" class="value">—</div></div><div class="card"><div class="label">Unseen test hours</div><div id="pHours" class="value">—</div></div></div><div class="section card"><h2 class="title">Error reduction vs weekly seasonal baseline</h2><div id="perfChart" class="small"></div></div><div id="perfTable" class="section table"></div></section>
-<section id="unusual" class="panel"><div class="grid"><div class="card"><div class="label">Unusual hours</div><div id="uCount" class="value">—</div></div><div class="card"><div class="label">Largest difference</div><div id="uMax" class="value">—</div><div class="mini">detections/hour</div></div><div class="card"><div class="label">Largest event date</div><div id="uDate" class="value" style="font-size:20px">—</div></div><div class="card"><div class="label">Interpretation</div><div style="font-weight:800;font-size:17px">Candidate unusual activity</div><div class="mini">Not proof of a real-world event</div></div></div><div class="section card"><h2 class="title">Observed vs expected during unusual periods</h2><div id="anomalyChart" class="chart"></div></div><div class="section"><h2 class="title">Highest-deviation periods</h2><div id="anomalyTable" class="table"></div></div></section>
-<footer>Pedestrian counts are sensor detections, not unique individuals. Forecasts shown here are precomputed.</footer></div></div>
+
+
+<body>
+
+<div class="wrap">
+
+  <!-- ================================================= -->
+  <!-- HEADER -->
+  <!-- ================================================= -->
+
+  <header>
+
+    <div>
+
+      <h1>
+        🚶 Melbourne Pedestrian Intelligence
+      </h1>
+
+      <div class="subtitle">
+
+        Interactive Melbourne pedestrian analytics and AI forecasting
+        using precomputed TimesFM 3 forecasts.
+
+      </div>
+
+    </div>
+
+
+    <div class="badge">
+      GitHub Pages edition
+    </div>
+
+  </header>
+
+
+  <!-- ================================================= -->
+  <!-- LOADING STATUS -->
+  <!-- ================================================= -->
+
+  <div
+    id="loadStatus"
+    class="loading"
+  >
+    Loading dashboard data…
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- DASHBOARD -->
+  <!-- ================================================= -->
+
+  <main
+    id="dashboardApp"
+    style="display:none"
+  >
+
+
+    <!-- ================================================= -->
+    <!-- TABS -->
+    <!-- ================================================= -->
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        data-tab="overviewPanel"
+      >
+        🏙️ Overview
+      </button>
+
+
+      <button
+        class="tab"
+        data-tab="forecastPanel"
+      >
+        🔮 AI Forecast
+      </button>
+
+
+      <button
+        class="tab"
+        data-tab="performancePanel"
+      >
+        🏆 Model Performance
+      </button>
+
+
+      <button
+        class="tab"
+        data-tab="unusualPanel"
+      >
+        ⚠️ Unusual Activity
+      </button>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- OVERVIEW -->
+    <!-- ================================================= -->
+
+    <section
+      id="overviewPanel"
+      class="panel active"
+    >
+
+
+      <div class="grid">
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Reliable sensors
+          </div>
+
+          <div
+            id="overviewSensors"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            Recent sensors meeting quality rules
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            AI forecast locations
+          </div>
+
+          <div
+            id="overviewForecastLocations"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            Locations with 168-hour forecasts
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            TimesFM test WAPE
+          </div>
+
+          <div
+            id="overviewWape"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            Lower is better
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            WAPE error reduction
+          </div>
+
+          <div
+            id="overviewImprovement"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            vs weekly seasonal baseline
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="section card">
+
+        <h2 class="section-title">
+          What this project does
+        </h2>
+
+
+        <div style="line-height:1.75">
+
+          This project combines Melbourne pedestrian analytics
+          with foundation-model forecasting.
+
+          It includes multi-location 7-day forecasts,
+          80% prediction intervals,
+          model benchmarking,
+          and forecast-based unusual-activity screening.
+
+        </div>
+
+
+        <div
+          id="overviewCallout"
+          class="callout"
+        >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- FORECAST -->
+    <!-- ================================================= -->
+
+    <section
+      id="forecastPanel"
+      class="panel"
+    >
+
+
+      <div class="controls">
+
+        <div>
+
+          <label for="sensorSelect">
+            Pedestrian sensor
+          </label>
+
+          <select id="sensorSelect">
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="grid">
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Peak hour
+          </div>
+
+          <div
+            id="forecastPeak"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div
+            id="forecastPeakTime"
+            class="metric-sub"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            168-hour total
+          </div>
+
+          <div
+            id="forecastTotal"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            Predicted detections
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Hourly average
+          </div>
+
+          <div
+            id="forecastAverage"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            Predicted detections/hour
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Busiest complete day
+          </div>
+
+          <div
+            id="forecastBusyDay"
+            class="metric-value"
+            style="font-size:21px"
+          >
+            —
+          </div>
+
+          <div
+            id="forecastBusyTotal"
+            class="metric-sub"
+          >
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="section card">
+
+        <h2
+          id="forecastTitle"
+          class="section-title"
+        >
+          7-day forecast
+        </h2>
+
+
+        <div
+          id="forecastChart"
+          class="chart"
+        >
+        </div>
+
+      </div>
+
+
+      <div class="section card">
+
+        <h2 class="section-title">
+          Predicted activity by day
+        </h2>
+
+        <div
+          id="dailyChart"
+          class="small-chart"
+        >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- MODEL PERFORMANCE -->
+    <!-- ================================================= -->
+
+    <section
+      id="performancePanel"
+      class="panel"
+    >
+
+
+      <div class="grid">
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            WAPE reduction
+          </div>
+
+          <div
+            id="perfWape"
+            class="metric-value"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            MAE reduction
+          </div>
+
+          <div
+            id="perfMae"
+            class="metric-value"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            RMSE reduction
+          </div>
+
+          <div
+            id="perfRmse"
+            class="metric-value"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Unseen test hours
+          </div>
+
+          <div
+            id="perfHours"
+            class="metric-value"
+          >
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="section card">
+
+        <h2 class="section-title">
+          Error reduction compared with weekly baseline
+        </h2>
+
+        <div
+          id="performanceChart"
+          class="small-chart"
+        >
+        </div>
+
+      </div>
+
+
+      <div class="section">
+
+        <div
+          id="performanceTable"
+          class="table-wrap"
+        >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- UNUSUAL ACTIVITY -->
+    <!-- ================================================= -->
+
+    <section
+      id="unusualPanel"
+      class="panel"
+    >
+
+
+      <div class="grid">
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Unusual hours
+          </div>
+
+          <div
+            id="unusualCount"
+            class="metric-value"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Largest absolute difference
+          </div>
+
+          <div
+            id="unusualMax"
+            class="metric-value"
+          >
+            —
+          </div>
+
+          <div class="metric-sub">
+            detections/hour
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Largest event date
+          </div>
+
+          <div
+            id="unusualDate"
+            class="metric-value"
+            style="font-size:21px"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="metric-label">
+            Interpretation
+          </div>
+
+          <div
+            class="metric-value"
+            style="
+              font-size:17px;
+              line-height:1.35;
+            "
+          >
+            Candidate unusual activity
+          </div>
+
+          <div class="metric-sub">
+            Not proof of a real-world event
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="section card">
+
+        <h2 class="section-title">
+          Observed vs expected during unusual periods
+        </h2>
+
+        <div
+          id="unusualChart"
+          class="chart"
+        >
+        </div>
+
+      </div>
+
+
+      <div class="section">
+
+        <h2 class="section-title">
+          Highest-deviation periods
+        </h2>
+
+        <div
+          id="unusualTable"
+          class="table-wrap"
+        >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <footer>
+
+      Pedestrian counts represent sensor detections,
+      not unique individuals.
+
+      Forecasts are precomputed for this static GitHub Pages dashboard.
+
+    </footer>
+
+
+  </main>
+
+</div>
+
+
 <script>
-const F={sensors:'reliable_sensor_catalog.csv',forecasts:'melbourne_timesfm_forecasts.csv',performance:'model_performance.csv',anomalies:'pedestrian_unusual_activity.csv',test:'timesfm_final_test_results.csv'};let D={};
-const parse=u=>new Promise((res,rej)=>Papa.parse(u,{download:true,header:true,dynamicTyping:true,skipEmptyLines:true,complete:r=>r.errors?.length?rej(r.errors):res(r.data),error:rej}));const fmt=n=>new Intl.NumberFormat('en-AU',{maximumFractionDigits:0}).format(Number(n));const pct=n=>Number(n).toFixed(1)+'%';const dt=d=>new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'2-digit',month:'short',hour:'numeric',hour12:true}).format(new Date(d));const day=d=>new Intl.DateTimeFormat('en-AU',{weekday:'short',day:'2-digit',month:'short'}).format(new Date(d));
-function tbl(rows,cols,labels){return '<table><thead><tr>'+labels.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+cols.map(c=>{let v=r[c];if(c==='datetime')v=new Date(v).toLocaleString('en-AU');else if(typeof v==='number')v=Number(v).toLocaleString('en-AU',{maximumFractionDigits:2});return '<td>'+(v??'')+'</td>'}).join('')+'</tr>').join('')+'</tbody></table>'}
-function perf(){const t=D.performance.find(r=>String(r.Model).trim()==='TimesFM 3'),b=D.performance.find(r=>String(r.Model).includes('Weekly Seasonal'));return{t,b}}function imp(a,b){return(b-a)/b*100}
-function tabs(){document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');window.dispatchEvent(new Event('resize'))})}
-function overview(){const{t,b}=perf();mSensors.textContent=fmt(D.sensors.length);mForecastSensors.textContent=fmt(new Set(D.forecasts.map(r=>r.sensor_id)).size);mWape.textContent=pct(t.WAPE);mImprove.textContent=pct(imp(t.WAPE,b.WAPE));overviewCallout.innerHTML='<b>Key result:</b> On '+fmt(t.Test_Hours)+' unseen hourly observations, TimesFM achieved <b>'+Number(t.WAPE).toFixed(2)+'% WAPE</b> vs <b>'+Number(b.WAPE).toFixed(2)+'%</b> for the weekly baseline — a <b>'+imp(t.WAPE,b.WAPE).toFixed(1)+'% reduction</b>.'}
-function sensorSetup(){const m=new Map();D.forecasts.forEach(r=>{if(!m.has(r.sensor_id))m.set(r.sensor_id,r.sensor_name||'Sensor '+r.sensor_id)});const e=[...m.entries()].sort((a,b)=>String(a[1]).localeCompare(String(b[1])));sensorSelect.innerHTML=e.map(([id,n])=>'<option value="'+id+'">'+n+' — ID '+id+'</option>').join('');sensorSelect.onchange=()=>forecast(sensorSelect.value);forecast(e[0][0])}
-function forecast(id){const r=D.forecasts.filter(x=>String(x.sensor_id)===String(id)).sort((a,b)=>new Date(a.datetime)-new Date(b.datetime));if(!r.length)return;const name=r[0].sensor_name||'Sensor '+id,peak=r.reduce((a,b)=>b.forecast>a.forecast?b:a),total=r.reduce((s,x)=>s+Number(x.forecast||0),0),avg=total/r.length,bd={};r.forEach(x=>{const k=new Date(x.datetime).toISOString().slice(0,10);bd[k]??={sum:0,n:0};bd[k].sum+=Number(x.forecast||0);bd[k].n++});const complete=Object.entries(bd).filter(x=>x[1].n===24),busy=complete.length?complete.reduce((a,b)=>b[1].sum>a[1].sum?b:a):null;forecastTitle.textContent='7-Day Forecast — '+name;fPeak.textContent=fmt(peak.forecast)+'/hr';fPeakTime.textContent=dt(peak.datetime);fTotal.textContent=fmt(total);fAvg.textContent=fmt(avg);fBusyDay.textContent=busy?day(busy[0]+'T12:00:00'):'N/A';fBusyTotal.textContent=busy?fmt(busy[1].sum)+' predicted detections':'';const x=r.map(z=>z.datetime);Plotly.react('forecastChart',[{x,y:r.map(z=>z.upper_80),type:'scatter',mode:'lines',line:{width:0},showlegend:false,hoverinfo:'skip'},{x,y:r.map(z=>z.lower_80),type:'scatter',mode:'lines',line:{width:0},fill:'tonexty',fillcolor:'rgba(21,154,140,.18)',name:'80% prediction interval',hoverinfo:'skip'},{x,y:r.map(z=>z.forecast),type:'scatter',mode:'lines',name:'TimesFM forecast',line:{color:'#159a8c',width:3}}],{margin:{t:20,l:65,r:25,b:60},paper_bgcolor:'#fff',plot_bgcolor:'#fff',xaxis:{title:'Date and time',gridcolor:'#edf0f2'},yaxis:{title:'Pedestrian detections/hour',gridcolor:'#edf0f2'},legend:{orientation:'h',x:.5,xanchor:'center',y:1.12},hovermode:'x unified'},{responsive:true,displaylogo:false});const daily=Object.entries(bd).sort((a,b)=>a[0].localeCompare(b[0]));Plotly.react('dailyChart',[{x:daily.map(([d])=>day(d+'T12:00:00')),y:daily.map(([,v])=>v.sum),type:'bar',marker:{color:'#d99a53'}}],{margin:{t:15,l:65,r:25,b:55},paper_bgcolor:'#fff',plot_bgcolor:'#fff',yaxis:{title:'Predicted detections',gridcolor:'#edf0f2'}},{responsive:true,displaylogo:false})}
-function performance(){const{t,b}=perf(),wi=imp(t.WAPE,b.WAPE),mi=imp(t.MAE,b.MAE),ri=imp(t.RMSE,b.RMSE);pWape.textContent=pct(wi);pMae.textContent=pct(mi);pRmse.textContent=pct(ri);pHours.textContent=fmt(t.Test_Hours);Plotly.react('perfChart',[{x:[wi,mi,ri],y:['WAPE','MAE','RMSE'],type:'bar',orientation:'h',marker:{color:['#159a8c','#42b7a5','#76c9bb']},text:[pct(wi),pct(mi),pct(ri)],textposition:'outside'}],{margin:{t:15,l:70,r:70,b:55},paper_bgcolor:'#fff',plot_bgcolor:'#fff',xaxis:{title:'Error reduction (%)',ticksuffix:'%',gridcolor:'#edf0f2'}},{responsive:true,displaylogo:false});perfTable.innerHTML=tbl(D.performance,['Model','MAE','RMSE','WAPE','Test_Hours'],['Model','MAE','RMSE','WAPE (%)','Test hours'])}
-function unusual(){const r=[...D.anomalies].sort((a,b)=>Number(b.absolute_error)-Number(a.absolute_error));uCount.textContent=fmt(r.length);uMax.textContent=fmt(r[0].absolute_error);uDate.textContent=new Date(r[0].datetime).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});Plotly.react('anomalyChart',[{x:r.map(x=>x.datetime),y:r.map(x=>x.actual),type:'scatter',mode:'markers',name:'Actual',marker:{size:10,color:'#d46a5d'}},{x:r.map(x=>x.datetime),y:r.map(x=>x.timesfm),type:'scatter',mode:'markers',name:'TimesFM expected',marker:{size:9,color:'#159a8c',symbol:'diamond'}}],{margin:{t:20,l:65,r:25,b:60},paper_bgcolor:'#fff',plot_bgcolor:'#fff',xaxis:{title:'Date',gridcolor:'#edf0f2'},yaxis:{title:'Pedestrian detections/hour',gridcolor:'#edf0f2'},legend:{orientation:'h',x:.5,xanchor:'center',y:1.12}},{responsive:true,displaylogo:false});anomalyTable.innerHTML=tbl(r.slice(0,15),['datetime','actual','timesfm','residual','absolute_error'],['Date & time','Actual','Expected','Difference','Absolute difference'])}
-(async()=>{try{const a=await Promise.all([parse(F.sensors),parse(F.forecasts),parse(F.performance),parse(F.anomalies),parse(F.test)]);D={sensors:a[0],forecasts:a[1],performance:a[2],anomalies:a[3],test:a[4]};tabs();overview();sensorSetup();performance();unusual();status.style.display='none';app.style.display='block'}catch(e){console.error(e);status.className='error';status.innerHTML='<b>Dashboard data could not load.</b><br>Put index.html and all CSV files in the same repository folder, then refresh.'}})();
-</script></body></html>
+
+  /* ===================================================== */
+  /* FILE NAMES                                           */
+  /* ===================================================== */
+
+  const FILES = {
+
+    sensors:
+      "reliable_sensor_catalog.csv",
+
+    forecasts:
+      "melbourne_timesfm_forecasts.csv",
+
+    performance:
+      "model_performance.csv",
+
+    anomalies:
+      "pedestrian_unusual_activity.csv",
+
+    testResults:
+      "timesfm_final_test_results.csv"
+
+  };
+
+
+  /* ===================================================== */
+  /* GLOBAL DASHBOARD DATA                                */
+  /* ===================================================== */
+
+  const dashboardData = {};
+
+
+  /* ===================================================== */
+  /* FORMATTING                                           */
+  /* ===================================================== */
+
+  const fmt = (value) =>
+
+    new Intl.NumberFormat(
+      "en-AU",
+      {
+        maximumFractionDigits: 0
+      }
+    ).format(
+      Number(value)
+    );
+
+
+  const pct = (value) =>
+
+    `${Number(value).toFixed(1)}%`;
+
+
+  /* ===================================================== */
+  /* DATE HELPERS                                         */
+  /* ===================================================== */
+
+  function normaliseDateTime(value) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+      return "";
+    }
+
+
+    const text =
+      String(value).trim();
+
+
+    return text.includes("T")
+      ? text
+      : text.replace(" ", "T");
+
+  }
+
+
+  function displayDateTime(value) {
+
+    const text =
+      normaliseDateTime(value);
+
+
+    const match =
+      text.match(
+        /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/
+      );
+
+
+    if (!match) {
+
+      return String(value);
+
+    }
+
+
+    const [
+      ,
+      year,
+      monthNumber,
+      day,
+      hourText,
+      minute
+    ] = match;
+
+
+    const safeDate =
+      new Date(
+        `${year}-${monthNumber}-${day}T12:00:00Z`
+      );
+
+
+    const weekday =
+      safeDate.toLocaleDateString(
+        "en-AU",
+        {
+          weekday: "short",
+          timeZone: "Australia/Melbourne"
+        }
+      );
+
+
+    const month =
+      safeDate.toLocaleDateString(
+        "en-AU",
+        {
+          month: "short",
+          timeZone: "Australia/Melbourne"
+        }
+      );
+
+
+    let hour =
+      Number(hourText);
+
+
+    const ampm =
+      hour >= 12
+        ? "PM"
+        : "AM";
+
+
+    hour =
+      hour % 12 || 12;
+
+
+    return (
+      `${weekday} ${day} ${month}, ` +
+      `${hour}:${minute} ${ampm}`
+    );
+
+  }
+
+
+  function displayDay(dateString) {
+
+    const safeDate =
+      new Date(
+        `${dateString}T12:00:00Z`
+      );
+
+
+    return safeDate.toLocaleDateString(
+      "en-AU",
+      {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        timeZone: "Australia/Melbourne"
+      }
+    );
+
+  }
+
+
+  /* ===================================================== */
+  /* LOAD CSV                                             */
+  /* ===================================================== */
+
+  function parseCsvFile(url) {
+
+    return new Promise(
+      (
+        resolve,
+        reject
+      ) => {
+
+        Papa.parse(
+          url,
+          {
+
+            download: true,
+
+            header: true,
+
+            dynamicTyping: true,
+
+            skipEmptyLines: true,
+
+
+            complete: (result) => {
+
+              if (
+                result.errors &&
+                result.errors.length
+              ) {
+
+                reject(
+                  new Error(
+                    `${url}: ` +
+                    result.errors[0].message
+                  )
+                );
+
+                return;
+              }
+
+
+              resolve(
+                result.data
+              );
+
+            },
+
+
+            error: (error) => {
+
+              reject(error);
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ===================================================== */
+  /* HTML TABLE                                           */
+  /* ===================================================== */
+
+  function buildTable(
+    rows,
+    columns,
+    labels
+  ) {
+
+    let html =
+      "<table><thead><tr>";
+
+
+    html +=
+      labels
+        .map(
+          (label) =>
+            `<th>${label}</th>`
+        )
+        .join("");
+
+
+    html +=
+      "</tr></thead><tbody>";
+
+
+    for (const row of rows) {
+
+      html += "<tr>";
+
+
+      html +=
+        columns
+          .map(
+            (column) => {
+
+              let value =
+                row[column];
+
+
+              if (
+                column ===
+                "datetime"
+              ) {
+
+                value =
+                  displayDateTime(
+                    value
+                  );
+
+              }
+
+              else if (
+                typeof value ===
+                "number"
+              ) {
+
+                value =
+                  Number(value)
+                    .toLocaleString(
+                      "en-AU",
+                      {
+                        maximumFractionDigits:
+                          2
+                      }
+                    );
+
+              }
+
+
+              return (
+                `<td>` +
+                `${value ?? ""}` +
+                `</td>`
+              );
+
+            }
+          )
+          .join("");
+
+
+      html += "</tr>";
+
+    }
+
+
+    html +=
+      "</tbody></table>";
+
+
+    return html;
+
+  }
+
+
+  /* ===================================================== */
+  /* PERFORMANCE DATA                                     */
+  /* ===================================================== */
+
+  function getPerformanceRows() {
+
+    const timesFm =
+      dashboardData
+        .performance
+        .find(
+          (row) =>
+            String(row.Model)
+              .trim() ===
+            "TimesFM 3"
+        );
+
+
+    const baseline =
+      dashboardData
+        .performance
+        .find(
+          (row) =>
+            String(row.Model)
+              .includes(
+                "Weekly Seasonal"
+              )
+        );
+
+
+    if (
+      !timesFm ||
+      !baseline
+    ) {
+
+      throw new Error(
+        "Could not find TimesFM and baseline rows in model_performance.csv"
+      );
+
+    }
+
+
+    return {
+      timesFm,
+      baseline
+    };
+
+  }
+
+
+  function errorReduction(
+    modelValue,
+    baselineValue
+  ) {
+
+    return (
+
+      (
+        Number(baselineValue) -
+        Number(modelValue)
+      )
+
+      /
+
+      Number(baselineValue)
+
+      *
+
+      100
+
+    );
+
+  }
+
+
+  /* ===================================================== */
+  /* TABS                                                 */
+  /* ===================================================== */
+
+  function setupTabs() {
+
+    document
+      .querySelectorAll(".tab")
+      .forEach(
+        (button) => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              document
+                .querySelectorAll(
+                  ".tab"
+                )
+                .forEach(
+                  (item) =>
+                    item
+                      .classList
+                      .remove(
+                        "active"
+                      )
+                );
+
+
+              document
+                .querySelectorAll(
+                  ".panel"
+                )
+                .forEach(
+                  (item) =>
+                    item
+                      .classList
+                      .remove(
+                        "active"
+                      )
+                );
+
+
+              button
+                .classList
+                .add(
+                  "active"
+                );
+
+
+              document
+                .getElementById(
+                  button.dataset.tab
+                )
+                .classList
+                .add(
+                  "active"
+                );
+
+
+              window.dispatchEvent(
+                new Event(
+                  "resize"
+                )
+              );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+
+  /* ===================================================== */
+  /* OVERVIEW                                             */
+  /* ===================================================== */
+
+  function renderOverview() {
+
+    const {
+      timesFm,
+      baseline
+    } =
+      getPerformanceRows();
+
+
+    const forecastSensorCount =
+      new Set(
+        dashboardData
+          .forecasts
+          .map(
+            (row) =>
+              row.sensor_id
+          )
+      ).size;
+
+
+    const wapeImprovement =
+      errorReduction(
+        timesFm.WAPE,
+        baseline.WAPE
+      );
+
+
+    document
+      .getElementById(
+        "overviewSensors"
+      )
+      .textContent =
+        fmt(
+          dashboardData
+            .sensors
+            .length
+        );
+
+
+    document
+      .getElementById(
+        "overviewForecastLocations"
+      )
+      .textContent =
+        fmt(
+          forecastSensorCount
+        );
+
+
+    document
+      .getElementById(
+        "overviewWape"
+      )
+      .textContent =
+        `${Number(
+          timesFm.WAPE
+        ).toFixed(2)}%`;
+
+
+    document
+      .getElementById(
+        "overviewImprovement"
+      )
+      .textContent =
+        pct(
+          wapeImprovement
+        );
+
+
+    document
+      .getElementById(
+        "overviewCallout"
+      )
+      .innerHTML = `
+
+        <b>
+          Key modelling result:
+        </b>
+
+        On
+        <b>
+          ${fmt(
+            timesFm.Test_Hours
+          )}
+        </b>
+        unseen hourly observations,
+
+        TimesFM achieved
+
+        <b>
+          ${Number(
+            timesFm.WAPE
+          ).toFixed(2)}%
+          WAPE
+        </b>,
+
+        compared with
+
+        <b>
+          ${Number(
+            baseline.WAPE
+          ).toFixed(2)}%
+        </b>
+
+        for the weekly seasonal baseline —
+
+        a
+
+        <b>
+          ${wapeImprovement.toFixed(1)}%
+          reduction in WAPE
+        </b>.
+
+      `;
+
+  }
+
+
+  /* ===================================================== */
+  /* SENSOR SELECT                                        */
+  /* ===================================================== */
+
+  function setupSensorDropdown() {
+
+    const sensorMap =
+      new Map();
+
+
+    for (
+      const row
+      of dashboardData.forecasts
+    ) {
+
+      if (
+        !sensorMap.has(
+          row.sensor_id
+        )
+      ) {
+
+        sensorMap.set(
+
+          row.sensor_id,
+
+          row.sensor_name ||
+          `Sensor ${row.sensor_id}`
+
+        );
+
+      }
+
+    }
+
+
+    const entries =
+
+      [
+        ...sensorMap.entries()
+      ]
+
+      .sort(
+        (a, b) =>
+
+          String(a[1])
+            .localeCompare(
+              String(b[1])
+            )
+      );
+
+
+    const select =
+      document
+        .getElementById(
+          "sensorSelect"
+        );
+
+
+    select.innerHTML =
+
+      entries
+        .map(
+          (
+            [
+              id,
+              name
+            ]
+          ) =>
+
+            `<option value="${id}">` +
+            `${name} — ID ${id}` +
+            `</option>`
+
+        )
+        .join("");
+
+
+    select.addEventListener(
+
+      "change",
+
+      () =>
+        renderForecast(
+          select.value
+        )
+
+    );
+
+
+    if (
+      entries.length
+    ) {
+
+      renderForecast(
+        entries[0][0]
+      );
+
+    }
+
+  }
+
+
+  /* ===================================================== */
+  /* FORECAST                                             */
+  /* ===================================================== */
+
+  function renderForecast(
+    sensorId
+  ) {
+
+    const rows =
+
+      dashboardData
+        .forecasts
+
+        .filter(
+          (row) =>
+            String(
+              row.sensor_id
+            ) ===
+            String(
+              sensorId
+            )
+        )
+
+        .sort(
+          (a, b) =>
+
+            String(
+              a.datetime
+            )
+            .localeCompare(
+              String(
+                b.datetime
+              )
+            )
+        );
+
+
+    if (
+      !rows.length
+    ) {
+      return;
+    }
+
+
+    const sensorName =
+
+      rows[0].sensor_name ||
+
+      `Sensor ${sensorId}`;
+
+
+    const peak =
+
+      rows.reduce(
+        (
+          best,
+          row
+        ) =>
+
+          Number(
+            row.forecast
+          )
+          >
+          Number(
+            best.forecast
+          )
+
+          ? row
+          : best
+      );
+
+
+    const total =
+
+      rows.reduce(
+        (
+          sum,
+          row
+        ) =>
+
+          sum +
+
+          Number(
+            row.forecast ||
+            0
+          ),
+
+        0
+      );
+
+
+    const average =
+
+      total /
+      rows.length;
+
+
+    const byDay = {};
+
+
+    rows.forEach(
+      (row) => {
+
+        const day =
+          String(
+            row.datetime
+          ).slice(
+            0,
+            10
+          );
+
+
+        if (
+          !byDay[day]
+        ) {
+
+          byDay[day] = {
+            total: 0,
+            hours: 0
+          };
+
+        }
+
+
+        byDay[day].total +=
+          Number(
+            row.forecast ||
+            0
+          );
+
+
+        byDay[day].hours +=
+          1;
+
+      }
+    );
+
+
+    const completeDays =
+
+      Object
+        .entries(
+          byDay
+        )
+        .filter(
+          (
+            [
+              ,
+              value
+            ]
+          ) =>
+            value.hours ===
+            24
+        );
+
+
+    const busiestDay =
+
+      completeDays.length
+
+      ?
+
+      completeDays.reduce(
+        (
+          best,
+          current
+        ) =>
+
+          current[1].total
+          >
+          best[1].total
+
+          ? current
+          : best
+      )
+
+      :
+
+      null;
+
+
+    document
+      .getElementById(
+        "forecastTitle"
+      )
+      .textContent =
+
+        `7-Day Forecast — ${sensorName}`;
+
+
+    document
+      .getElementById(
+        "forecastPeak"
+      )
+      .textContent =
+
+        `${fmt(
+          peak.forecast
+        )}/hr`;
+
+
+    document
+      .getElementById(
+        "forecastPeakTime"
+      )
+      .textContent =
+
+        displayDateTime(
+          peak.datetime
+        );
+
+
+    document
+      .getElementById(
+        "forecastTotal"
+      )
+      .textContent =
+
+        fmt(
+          total
+        );
+
+
+    document
+      .getElementById(
+        "forecastAverage"
+      )
+      .textContent =
+
+        fmt(
+          average
+        );
+
+
+    document
+      .getElementById(
+        "forecastBusyDay"
+      )
+      .textContent =
+
+        busiestDay
+
+        ?
+
+        displayDay(
+          busiestDay[0]
+        )
+
+        :
+
+        "N/A";
+
+
+    document
+      .getElementById(
+        "forecastBusyTotal"
+      )
+      .textContent =
+
+        busiestDay
+
+        ?
+
+        `${fmt(
+          busiestDay[1].total
+        )} predicted detections`
+
+        :
+
+        "";
+
+
+    const x =
+
+      rows.map(
+        (row) =>
+          normaliseDateTime(
+            row.datetime
+          )
+      );
+
+
+    const upper =
+
+      rows.map(
+        (row) =>
+          Number(
+            row.upper_80
+          )
+      );
+
+
+    const lower =
+
+      rows.map(
+        (row) =>
+          Number(
+            row.lower_80
+          )
+      );
+
+
+    const forecast =
+
+      rows.map(
+        (row) =>
+          Number(
+            row.forecast
+          )
+      );
+
+
+    Plotly.react(
+
+      "forecastChart",
+
+      [
+
+        {
+          x: x,
+
+          y: upper,
+
+          type: "scatter",
+
+          mode: "lines",
+
+          line: {
+            width: 0
+          },
+
+          hoverinfo: "skip",
+
+          showlegend: false
+        },
+
+
+        {
+          x: x,
+
+          y: lower,
+
+          type: "scatter",
+
+          mode: "lines",
+
+          line: {
+            width: 0
+          },
+
+          fill:
+            "tonexty",
+
+          fillcolor:
+            "rgba(21,154,140,0.18)",
+
+          name:
+            "80% prediction interval",
+
+          hoverinfo:
+            "skip"
+        },
+
+
+        {
+          x: x,
+
+          y: forecast,
+
+          type:
+            "scatter",
+
+          mode:
+            "lines",
+
+          name:
+            "TimesFM forecast",
+
+          line: {
+            color:
+              "#159a8c",
+
+            width:
+              3
+          },
+
+          hovertemplate:
+
+            "%{x}" +
+
+            "<br>" +
+
+            "%{y:,.0f} detections/hour" +
+
+            "<extra></extra>"
+        }
+
+      ],
+
+
+      {
+
+        margin: {
+          t: 20,
+          l: 70,
+          r: 25,
+          b: 60
+        },
+
+        paper_bgcolor:
+          "#ffffff",
+
+        plot_bgcolor:
+          "#ffffff",
+
+
+        xaxis: {
+
+          title:
+            "Date and time",
+
+          gridcolor:
+            "#edf0f2"
+
+        },
+
+
+        yaxis: {
+
+          title:
+            "Pedestrian detections/hour",
+
+          gridcolor:
+            "#edf0f2",
+
+          rangemode:
+            "tozero"
+
+        },
+
+
+        legend: {
+
+          orientation:
+            "h",
+
+          x:
+            0.5,
+
+          xanchor:
+            "center",
+
+          y:
+            1.12
+
+        },
+
+
+        hovermode:
+          "x unified"
+
+      },
+
+
+      {
+
+        responsive:
+          true,
+
+        displaylogo:
+          false
+
+      }
+
+    );
+
+
+    const daily =
+
+      Object
+        .entries(
+          byDay
+        )
+        .sort(
+          (a, b) =>
+            a[0]
+              .localeCompare(
+                b[0]
+              )
+        );
+
+
+    Plotly.react(
+
+      "dailyChart",
+
+      [
+
+        {
+
+          x:
+            daily.map(
+              (
+                [
+                  date
+                ]
+              ) =>
+                displayDay(
+                  date
+                )
+            ),
+
+
+          y:
+            daily.map(
+              (
+                [
+                  ,
+                  value
+                ]
+              ) =>
+                value.total
+            ),
+
+
+          type:
+            "bar",
+
+
+          marker: {
+            color:
+              "#d99a53"
+          },
+
+
+          hovertemplate:
+
+            "%{x}" +
+
+            "<br>" +
+
+            "%{y:,.0f} predicted detections" +
+
+            "<extra></extra>"
+
+        }
+
+      ],
+
+
+      {
+
+        margin: {
+          t: 15,
+          l: 70,
+          r: 25,
+          b: 55
+        },
+
+
+        paper_bgcolor:
+          "#ffffff",
+
+        plot_bgcolor:
+          "#ffffff",
+
+
+        xaxis: {
+          title: ""
+        },
+
+
+        yaxis: {
+
+          title:
+            "Predicted detections",
+
+          gridcolor:
+            "#edf0f2",
+
+          rangemode:
+            "tozero"
+
+        }
+
+      },
+
+
+      {
+
+        responsive:
+          true,
+
+        displaylogo:
+          false
+
+      }
+
+    );
+
+  }
+
+
+  /* ===================================================== */
+  /* MODEL PERFORMANCE                                    */
+  /* ===================================================== */
+
+  function renderPerformance() {
+
+    const {
+      timesFm,
+      baseline
+    } =
+      getPerformanceRows();
+
+
+    const wapeReduction =
+      errorReduction(
+        timesFm.WAPE,
+        baseline.WAPE
+      );
+
+
+    const maeReduction =
+      errorReduction(
+        timesFm.MAE,
+        baseline.MAE
+      );
+
+
+    const rmseReduction =
+      errorReduction(
+        timesFm.RMSE,
+        baseline.RMSE
+      );
+
+
+    document
+      .getElementById(
+        "perfWape"
+      )
+      .textContent =
+        pct(
+          wapeReduction
+        );
+
+
+    document
+      .getElementById(
+        "perfMae"
+      )
+      .textContent =
+        pct(
+          maeReduction
+        );
+
+
+    document
+      .getElementById(
+        "perfRmse"
+      )
+      .textContent =
+        pct(
+          rmseReduction
+        );
+
+
+    document
+      .getElementById(
+        "perfHours"
+      )
+      .textContent =
+        fmt(
+          timesFm.Test_Hours
+        );
+
+
+    Plotly.react(
+
+      "performanceChart",
+
+      [
+
+        {
+
+          x: [
+            wapeReduction,
+            maeReduction,
+            rmseReduction
+          ],
+
+
+          y: [
+            "WAPE",
+            "MAE",
+            "RMSE"
+          ],
+
+
+          type:
+            "bar",
+
+
+          orientation:
+            "h",
+
+
+          marker: {
+
+            color: [
+              "#159a8c",
+              "#55b8aa",
+              "#78c9be"
+            ]
+
+          },
+
+
+          text: [
+
+            pct(
+              wapeReduction
+            ),
+
+            pct(
+              maeReduction
+            ),
+
+            pct(
+              rmseReduction
+            )
+
+          ],
+
+
+          textposition:
+            "outside",
+
+
+          hovertemplate:
+
+            "%{y}: " +
+
+            "%{x:.1f}% lower error" +
+
+            "<extra></extra>"
+
+        }
+
+      ],
+
+
+      {
+
+        margin: {
+          t: 15,
+          l: 70,
+          r: 80,
+          b: 55
+        },
+
+
+        paper_bgcolor:
+          "#ffffff",
+
+        plot_bgcolor:
+          "#ffffff",
+
+
+        xaxis: {
+
+          title:
+            "Error reduction (%)",
+
+          ticksuffix:
+            "%",
+
+          gridcolor:
+            "#edf0f2",
+
+          rangemode:
+            "tozero"
+
+        },
+
+
+        yaxis: {
+          title: ""
+        }
+
+      },
+
+
+      {
+
+        responsive:
+          true,
+
+        displaylogo:
+          false
+
+      }
+
+    );
+
+
+    document
+      .getElementById(
+        "performanceTable"
+      )
+      .innerHTML =
+
+        buildTable(
+
+          dashboardData
+            .performance,
+
+          [
+            "Model",
+            "MAE",
+            "RMSE",
+            "WAPE",
+            "Test_Hours"
+          ],
+
+          [
+            "Model",
+            "MAE",
+            "RMSE",
+            "WAPE (%)",
+            "Test hours"
+          ]
+
+        );
+
+  }
+
+
+  /* ===================================================== */
+  /* UNUSUAL ACTIVITY                                     */
+  /* ===================================================== */
+
+  function renderUnusualActivity() {
+
+    const rows =
+
+      [
+        ...dashboardData
+          .anomalies
+      ]
+
+      .sort(
+        (a, b) =>
+
+          Number(
+            b.absolute_error
+          )
+
+          -
+
+          Number(
+            a.absolute_error
+          )
+      );
+
+
+    if (
+      !rows.length
+    ) {
+      return;
+    }
+
+
+    document
+      .getElementById(
+        "unusualCount"
+      )
+      .textContent =
+        fmt(
+          rows.length
+        );
+
+
+    document
+      .getElementById(
+        "unusualMax"
+      )
+      .textContent =
+        fmt(
+          rows[0]
+            .absolute_error
+        );
+
+
+    document
+      .getElementById(
+        "unusualDate"
+      )
+      .textContent =
+
+        displayDateTime(
+          rows[0]
+            .datetime
+        )
+        .split(",")[0];
+
+
+    Plotly.react(
+
+      "unusualChart",
+
+      [
+
+        {
+
+          x:
+            rows.map(
+              (row) =>
+                normaliseDateTime(
+                  row.datetime
+                )
+            ),
+
+
+          y:
+            rows.map(
+              (row) =>
+                Number(
+                  row.actual
+                )
+            ),
+
+
+          type:
+            "scatter",
+
+
+          mode:
+            "markers",
+
+
+          name:
+            "Actual",
+
+
+          marker: {
+
+            size:
+              10,
+
+            color:
+              "#d46a5d"
+
+          }
+
+        },
+
+
+        {
+
+          x:
+            rows.map(
+              (row) =>
+                normaliseDateTime(
+                  row.datetime
+                )
+            ),
+
+
+          y:
+            rows.map(
+              (row) =>
+                Number(
+                  row.timesfm
+                )
+            ),
+
+
+          type:
+            "scatter",
+
+
+          mode:
+            "markers",
+
+
+          name:
+            "TimesFM expected",
+
+
+          marker: {
+
+            size:
+              9,
+
+            color:
+              "#159a8c",
+
+            symbol:
+              "diamond"
+
+          }
+
+        }
+
+      ],
+
+
+      {
+
+        margin: {
+          t: 20,
+          l: 70,
+          r: 25,
+          b: 60
+        },
+
+
+        paper_bgcolor:
+          "#ffffff",
+
+        plot_bgcolor:
+          "#ffffff",
+
+
+        xaxis: {
+
+          title:
+            "Date",
+
+          gridcolor:
+            "#edf0f2"
+
+        },
+
+
+        yaxis: {
+
+          title:
+            "Pedestrian detections/hour",
+
+          gridcolor:
+            "#edf0f2",
+
+          rangemode:
+            "tozero"
+
+        },
+
+
+        legend: {
+
+          orientation:
+            "h",
+
+          x:
+            0.5,
+
+          xanchor:
+            "center",
+
+          y:
+            1.12
+
+        }
+
+      },
+
+
+      {
+
+        responsive:
+          true,
+
+        displaylogo:
+          false
+
+      }
+
+    );
+
+
+    document
+      .getElementById(
+        "unusualTable"
+      )
+      .innerHTML =
+
+        buildTable(
+
+          rows.slice(
+            0,
+            15
+          ),
+
+          [
+            "datetime",
+            "actual",
+            "timesfm",
+            "residual",
+            "absolute_error"
+          ],
+
+          [
+            "Date & time",
+            "Actual",
+            "Expected",
+            "Difference",
+            "Absolute difference"
+          ]
+
+        );
+
+  }
+
+
+  /* ===================================================== */
+  /* INITIALISE DASHBOARD                                 */
+  /* ===================================================== */
+
+  async function initDashboard() {
+
+    const statusBox =
+      document
+        .getElementById(
+          "loadStatus"
+        );
+
+
+    const appRoot =
+      document
+        .getElementById(
+          "dashboardApp"
+        );
+
+
+    try {
+
+
+      if (
+        typeof Papa ===
+        "undefined"
+      ) {
+
+        throw new Error(
+          "Papa Parse library failed to load."
+        );
+
+      }
+
+
+      if (
+        typeof Plotly ===
+        "undefined"
+      ) {
+
+        throw new Error(
+          "Plotly library failed to load."
+        );
+
+      }
+
+
+      const [
+
+        sensors,
+
+        forecasts,
+
+        performanceRows,
+
+        anomalies,
+
+        testResults
+
+      ] =
+
+        await Promise.all(
+
+          [
+
+            parseCsvFile(
+              FILES.sensors
+            ),
+
+            parseCsvFile(
+              FILES.forecasts
+            ),
+
+            parseCsvFile(
+              FILES.performance
+            ),
+
+            parseCsvFile(
+              FILES.anomalies
+            ),
+
+            parseCsvFile(
+              FILES.testResults
+            )
+
+          ]
+
+        );
+
+
+      dashboardData.sensors =
+        sensors;
+
+
+      dashboardData.forecasts =
+        forecasts;
+
+
+      dashboardData.performance =
+        performanceRows;
+
+
+      dashboardData.anomalies =
+        anomalies;
+
+
+      dashboardData.testResults =
+        testResults;
+
+
+      setupTabs();
+
+
+      renderOverview();
+
+
+      setupSensorDropdown();
+
+
+      renderPerformance();
+
+
+      renderUnusualActivity();
+
+
+      statusBox.style.display =
+        "none";
+
+
+      appRoot.style.display =
+        "block";
+
+
+    }
+
+    catch (
+      error
+    ) {
+
+
+      console.error(
+        "Dashboard load error:",
+        error
+      );
+
+
+      statusBox.className =
+        "error";
+
+
+      statusBox.innerHTML = `
+
+        <b>
+          Dashboard data could not load.
+        </b>
+
+        <br>
+
+        ${String(
+          error.message ||
+          error
+        )}
+
+        <br><br>
+
+        Check that
+        <code>
+          index.html
+        </code>
+        and all CSV files are in the repository root,
+        then hard-refresh the page.
+
+      `;
+
+    }
+
+  }
+
+
+  /* ===================================================== */
+  /* START ONLY AFTER HTML IS READY                       */
+  /* ===================================================== */
+
+  window.addEventListener(
+    "DOMContentLoaded",
+    initDashboard
+  );
+
+</script>
+
+
+</body>
+</html>
