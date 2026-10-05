@@ -1,0 +1,3 @@
+Model,MAE,RMSE,WAPE,Test_Hours
+TimesFM 3,54.16,87.96,8.49,456
+Weekly Seasonal Baseline,74.59,127.61,11.69,456
